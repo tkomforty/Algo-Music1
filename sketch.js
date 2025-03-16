@@ -423,12 +423,12 @@ function createNoteParticles(x, y, frequency, velocity) {
   let count = map(velocity, 0, 1, 5, 20);
   for (let i = 0; i < count; i++) {
     let angle = random(TWO_PI);
-    let speed = random(0.5, 2);
+    let speed = random(0.5, 20);
     
     let p = new Particle(x, y, noteColor);
     p.vel = p5.Vector.fromAngle(angle, speed);
     p.lifespan = particleLifespan * random(0.8, 1.2);
-    p.size = map(velocity, 0, 1, 3, 8);
+    p.size = map(velocity, 0, 1, 3, 80);
     
     particles.push(p);
   }
