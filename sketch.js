@@ -46,7 +46,7 @@ let masterReverb;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  colorMode(RGB);
+  colorMode(RGB, 255, 255, 255, 255);
   // Initialize blend mode
   currentBlendMode = BLEND;
   
@@ -73,12 +73,12 @@ function setup() {
 // Create a new color theme
 function updateColorTheme() {
   // Generate a theme based on a base hue
-  const baseHue = random(100);
+  const baseHue = random(255);
   
   colorTheme = {
     // Background colors
-    background: color(baseHue/180, 10, 100),
-    fadeColor: color(baseHue, 10, 5, fadeAmount * 255),
+    background: color(baseHue, 10, 5, 25),
+    fadeColor: color(baseHue, 10, 5,  10),
     
     // Particle colors
     particleColors: [
@@ -95,10 +95,10 @@ function updateColorTheme() {
     update: function() {
       // Subtle evolution of colors
       this.fadeColor = color(
-        (baseHue + sin(t * 0.1) * 10) % 360, 
+        (baseHue + sin(t * 0.1) * 10) % 255, 
         10, 
         5 + sin(t * 0.05) * 5, 
-        fadeAmount * 555
+        fadeAmount * 0.05
       );
     }
   };
@@ -168,12 +168,12 @@ function draw() {
 // Draw particles on the fade canvas
 function drawParticlesOnFadeCanvas() {
   fadeCanvas.push();
-  fadeCanvas.blendMode(ADD);
+  fadeCanvas.blendMode(BLEND);
   fadeCanvas.noStroke();
   
   for (let particle of particles) {
     // Use varying opacity based on particle lifespan
-    let opacity = map(particle.lifespan, 0, particleLifespan, 0, 100);
+    let opacity = map(particle.lifespan, 0, particleLifespan, 0, 10);
     fadeCanvas.fill(red(particle.color), green(particle.color), blue(particle.color), opacity * 0.5);
     
     // Draw trail for moving particles
@@ -503,7 +503,7 @@ function mousePressed() {
     createAudioEvent('note', mouseX, mouseY, 0.7);
     
     // Add several particles
-    for (let i = 0; i < 15; i++) {
+    for (let i = 0; i < 55; i++) {
       let p = new Particle(
         mouseX + random(-20, 20),
         mouseY + random(-20, 20)
@@ -530,7 +530,7 @@ function mouseDragged() {
   if (audioInitialized && frameCount % 3 === 0) {
     // Add particles along drag path
     let p = new Particle(mouseX, mouseY);
-    p.vel = createVector(movedX, movedY).mult(0.2);
+    p.vel = createVector(movedX, movedY).mult(0.82);
     particles.push(p);
     
     // Occasionally play a note based on mouse position
