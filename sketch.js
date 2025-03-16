@@ -1069,12 +1069,17 @@ function playTransitionChord(previousRoot) {
 }
 
 function touchStarted() {
-  // Handle touch same as mouse press
-  // Your handling code here, or just call your mousePressed function
-  mousePressed();
+  // Add a small delay to ensure iOS processes the event properly
+  setTimeout(() => {
+    // Handle your touch logic here
+    // For example, creating particles or initializing audio
+    mousePressed();
+  }, 10);
   
-  // IMPORTANT: prevent default to stop scrolling/zooming
+  // Prevent default to stop scrolling
   return false;
+  
+  
 }
 
 function touchMoved() {
