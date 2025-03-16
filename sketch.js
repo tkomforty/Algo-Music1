@@ -5,7 +5,7 @@ let scale = []; // Will hold our current scale notes as frequencies
 let rootFrequency = 261.63; // C3 in Hz
 let scaleType = "minor"; // Can be "minor" or "pentatonic"
 let lastNoteTime = 0;
-let noteSpacing = 250; // Minimum ms between notes
+let noteSpacing = 100; // Minimum ms between notes
 let activityLevel = 0; // Track visual activity
 let masterGain; // Added master gain node
 
@@ -218,7 +218,7 @@ function updateAndDrawParticles() {
     particle.update();
     
     // Add to activity level
-    activityLevel += map(particle.vel.mag(), 0, 3, 0, 0.5);
+    activityLevel += map(particle.vel.mag(), 0, 3, 0, 0.75);
     
     // Draw particle on main canvas for immediate display
     fill(red(particle.color), green(particle.color), blue(particle.color), 150);
@@ -300,15 +300,15 @@ function updateAndDrawAudioEvents() {
       for (let j = 0; j < 5; j++) {
         let angle = TWO_PI * j / 5;
         let r1 = event.radius;
-        let r2 = event.radius * 0.6;
+        let r2 = event.radius * 0.96;
         
         let x1 = sin(angle) * r1;
         let y1 = cos(angle) * r1;
-        let x2 = cos(angle + TWO_PI/10) * r2;
+        let x2 = cos(angle + TWO_PI/10) * r1;
         let y2 = sin(angle + TWO_PI/10) * r2;
         
         rect(x1, y1, r1);
-        rect(x2, y2, r2);
+        rect(x1, y2, r2);
       }
       endShape(CLOSE);
       pop();
@@ -324,59 +324,46 @@ function updateAndDrawAudioEvents() {
 }
 
 // Handle audio-related functionality
+// Adjust note spacing for more natural phrasing
 function handleAudio() {
   if (audioInitialized) {
-    // Smooth the activity level for more stable audio
+    // Smooth the activity level
     activityLevel = lerp(activityLevel, 
-                         constrain(activityLevel, 0.1, 0.9),
-                         0.05);
+                       constrain(activityLevel, 0.1, 0.9),
+                       0.05);
     
-    // Root note changes - infrequent to prevent overlapping transitions
-    if (frameCount % 480 === 0 || (activityLevel > 0.7 && frameCount % 240 === 0)) {
-      changeRootNote();
-      
-      // Create visual effect for key change
-      createAudioEvent('keyChange', width/2, height/2, 0.8, colorTheme.audioColor);
+    // Much better note spacing
+    noteSpacing = map(activityLevel, 0, 1, 300, 150);
+    
+    // Create phrase-based timing with proper rests
+    if (frameCount % 90 === 0) { // Phrase start point
+      const velocity = map(activityLevel, 0, 1, 0.3, 0.6);
+      playPhrase(velocity);
     }
-
-    // Musical phrases with 4/4 time signature
-    const timeSignature = 4;
-    const beatLength = 60; // frames per beat at ~60bpm
-
-    // Play notes on specific beats to create coherent phrases
-    if (frameCount % beatLength === 0) {
-      // Mainly on downbeats (first beat of measure)
-      if (frameCount % (beatLength * timeSignature) === 0) {
-        if (random() < 0.7) {
-          const velocity = map(activityLevel, 0, 1, 0.2, 0.5);
-          setTimeout(() => playNote(velocity), random(17, 100));
-        }
-      }
-      // Sometimes on beat 3
-      else if (frameCount % (beatLength * timeSignature) === beatLength * 2) {
-        if (random() < 0.4) {
-          const velocity = map(activityLevel, 0, 1, 0.15, 0.45);
-          setTimeout(() => playNote(velocity), random(20, 80));
-        }
-      }
-      // Rarely on other beats
-      else if (random() < 0.15) {
-        const velocity = map(activityLevel, 0, 1, 0.1, 0.3);
-        setTimeout(() => playNote(velocity), random(10, 50));
-      }
+    
+    // Occasional isolated notes
+    if (frameCount % 60 === 30 && random() < 0.3) {
+      const velocity = map(activityLevel, 0, 1, 0.2, 0.4);
+      setTimeout(() => playNote(velocity), random(0, 100));
     }
+  }
+}
 
-    // Occasional notes based on activity
-    if (frameCount % 30 === 0) {
-      const noteProb = map(activityLevel, 0, 1, 0.1, 0.4);
-      if (random() < noteProb) {
-        const velocity = map(activityLevel, 0, 1, 0.15, 0.3);
-        setTimeout(() => playNote(velocity), random(0, 400));
-      }
-    }
-
-    // Adjust note spacing based on activity
-    noteSpacing = map(activityLevel, 0, 1, 500, 250);
+// Play a musical phrase
+function playPhrase(velocity) {
+  // Number of notes in this phrase
+  const phraseLength = floor(random(3, 6));
+  
+  // Base timing between notes
+  const baseTiming = map(activityLevel, 0, 1, 300, 200);
+  
+  // Play each note in the phrase with timing
+  for (let i = 0; i < phraseLength; i++) {
+    setTimeout(() => {
+      // Emphasize first note of phrase
+      let noteVelocity = i === 0 ? velocity * 1.2 : velocity;
+      playNote(noteVelocity);
+    }, i * baseTiming);
   }
 }
 
