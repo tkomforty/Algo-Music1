@@ -1067,3 +1067,21 @@ function playTransitionChord(previousRoot) {
     console.error("Error playing transition chord:", e);
   }
 }
+
+function touchStarted() {
+  // Handle touch same as mouse press
+  // Your handling code here, or just call your mousePressed function
+  mousePressed();
+  
+  // IMPORTANT: prevent default to stop scrolling/zooming
+  return false;
+}
+
+function touchMoved() {
+  // Handle touch dragging same as mouse drag
+  // Your handling code here, or just call your mouseDragged function
+  mouseDragged();
+  
+  // IMPORTANT: prevent default to stop scrolling/zooming
+  return false;
+}
