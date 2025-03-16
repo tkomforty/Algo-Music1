@@ -67,7 +67,7 @@ function setup() {
   textAlign(CENTER, CENTER);
   textSize(24);
   fill(255);
-  text("Click to begin audio experience", width / 2, height / 2);
+  text("~~~", width / 2, height / 2);
 }
 
 // Create a new color theme
@@ -153,7 +153,7 @@ function draw() {
     textAlign(CENTER, CENTER);
     textSize(24);
     fill(255);
-    text("Click to begin audio experience", width / 2, height / 2);
+    text("~~~", width / 2, height / 2);
   }
   
   // Display volume control information if audio is initialized
